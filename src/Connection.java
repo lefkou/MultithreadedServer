@@ -12,11 +12,13 @@ public class Connection implements Runnable{
     private Socket incoming;
     private GUI gui;
     private Server server;
+    private MutexMonitor mtx;
 
-    public Connection(Socket incoming, Server server, GUI gui) {
+    public Connection(Socket incoming, Server server, GUI gui, MutexMonitor m) {
         this.incoming = incoming;
         this.gui = gui; 
         this.server = server;
+        this.mtx = m;
     }
 
     public Socket getIncoming(){
@@ -36,17 +38,19 @@ public class Connection implements Runnable{
                     (new InputStreamReader(incoming.getInputStream()));
             PrintWriter out = new PrintWriter
                     (incoming.getOutputStream(), true /* auto flush */);
+            // CODE FOR LOG 
             out.println("\nYou are connected to the share price "
                     + "quotation server: ");
             out.println(incoming.getLocalAddress()
                     + " on port " + incoming.getLocalPort()
                     + "\n"
             );
+            // CODE FOR LOG 
             log("\n" + this.server.getCurrentServerTime() +
                     ": Client with IP "+ incoming.getInetAddress() +
                     " at port " + incoming.getPort() + "\n\t  connected."
             );
-            // INSERT CODE FOR LOG 
+            // CODE FOR LOG 
             StockMarket.getPrices().values().forEach(v -> {
                 out.println("\r" + v.getCode() +": "+ "\t"+ v.getPrice());
             });
@@ -58,7 +62,7 @@ public class Connection implements Runnable{
                 if (str.trim().toUpperCase().equals("QUIT"))
                     break;
                 String[] array = str.trim().split(" ");
-                // get action
+                // get user action
                 String action = array[0].toUpperCase();
                 // get company code
                 String code = array[1].toUpperCase();
@@ -70,11 +74,15 @@ public class Connection implements Runnable{
                     CompanyShare cs = (CompanyShare) StockMarket.getPrices().get(code);
                      // if first word = BUY
                     if(action.equals("BUY")){
-                        int difference = cs.getNumberOfShares() - numberOfSharesReq;
+                        int difference = cs.getNumberOfShares() - Math.abs(numberOfSharesReq);
                         if(difference >= 0){
+                            // enter critical code section
+                            this.mtx.enterCrit();
                             cs.setNumberOfShares(difference);
+                            this.mtx.exitCrit();
+                            // exit
                             out.println("Order Confirmed");
-                            // INSERT CODE FOR LOG 
+                            // CODE FOR LOG 
                             log("\n"+ this.server.getCurrentServerTime() + 
                                 ": Client with IP "+ incoming.getInetAddress() +
                                 " at port " + incoming.getPort() + "\n\t  bought "+
@@ -86,9 +94,13 @@ public class Connection implements Runnable{
                     }
                     // if first word = SELL
                     if(action.equals("SELL")){
-                        cs.setNumberOfShares(cs.getNumberOfShares()+ numberOfSharesReq);
+                        // enter critical code section
+                        this.mtx.enterCrit();
+                        cs.setNumberOfShares(cs.getNumberOfShares()+ Math.abs(numberOfSharesReq));
+                        this.mtx.exitCrit();
+                        // exit
                         out.println("Order Confirmed");
-                        // INSERT CODE FOR LOG 
+                        // CODE FOR LOG 
                         log("\n"+ this.server.getCurrentServerTime() + 
                             ": Client with IP "+ incoming.getInetAddress() +
                             " at port " + incoming.getPort() + "\n\t  sold "+
@@ -99,6 +111,7 @@ public class Connection implements Runnable{
             }
             out.println("\nGoodbye.\n");
             incoming.close();
+            // CODE FOR LOG 
             log("\n"+ this.server.getCurrentServerTime() + 
                     ": Client with IP "+ incoming.getInetAddress() +
                     " at port " + incoming.getPort() + "\n\t  disconnected."

@@ -52,7 +52,7 @@ public class Server extends SwingWorker{
                 // accept connection
                 Socket incoming = s.accept();
                 // create connection
-                Connection t = new Connection(incoming, this, this.gui);
+                Connection t = new Connection(incoming, this, this.gui, new MutexMonitor());
                 // add IP to connected IP list
                 pool.submit(t);
                 // create a thread for each connection

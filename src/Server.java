@@ -22,6 +22,7 @@ public class Server extends SwingWorker{
     private List<Future> connectedClients;
     private GUI gui;
     protected ServerSocket s;
+    private MutexMonitor mtx;
 
     public Server(String IP_ADDRESS, int PORT, GUI gui) {
         this.PORT = PORT;
@@ -52,7 +53,7 @@ public class Server extends SwingWorker{
                 // accept connection
                 Socket incoming = s.accept();
                 // create connection
-                Connection t = new Connection(incoming, this, this.gui, new MutexMonitor());
+                Connection t = new Connection(incoming, this, this.gui, mtx);
                 // add IP to connected IP list
                 pool.submit(t);
                 // create a thread for each connection

@@ -22,7 +22,7 @@ public class Server extends SwingWorker{
     private List<Future> connectedClients;
     private GUI gui;
     protected ServerSocket s;
-    private MutexMonitor mtx;
+    private MutexMonitor mtx = new MutexMonitor();
 
     public Server(String IP_ADDRESS, int PORT, GUI gui) {
         this.PORT = PORT;

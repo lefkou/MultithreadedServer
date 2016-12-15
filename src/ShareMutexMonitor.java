@@ -8,7 +8,7 @@
  *
  * @author lef
  */
-public class MutexMonitor {
+public class ShareMutexMonitor {
     private boolean critCodeBusy = false;
     
     public synchronized void enterCrit(){

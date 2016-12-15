@@ -13,10 +13,10 @@ import java.util.HashMap;
  */
 public class StockMarket {
     private static HashMap<String, CompanyShare> prices = new HashMap<String, CompanyShare>(){{
-            put("SKY", new CompanyShare("SKY", 777.2 , 1000));
-            put("VOD", new CompanyShare("VOD", 123.4 , 1000));
-            put("TSCO", new CompanyShare("TSCO", 235.6 , 1000));
-            put("BP", new CompanyShare("BP", 401.5 , 1000));
+            put("SKY",  new CompanyShare("SKY" , 777.2, 1000));
+            put("VOD",  new CompanyShare("VOD" , 123.4, 1000));
+            put("TSCO", new CompanyShare("TSCO", 235.6, 1000));
+            put("BP",   new CompanyShare("BP"  , 401.5, 1000));
         }};
     
     protected static HashMap<String, CompanyShare> getPrices(){

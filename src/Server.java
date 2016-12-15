@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import javax.swing.SwingWorker;
 
 /**
@@ -15,20 +14,22 @@ import javax.swing.SwingWorker;
  */
 public class Server extends SwingWorker{
 
-    private final int NTHREADS = 1;
+    private final int NTHREADS = 10;
     private int PORT ;
     private String IP_ADDRESS;
     private ExecutorService pool;
-    private List<Future> connectedClients;
+    private List<Socket> connectedClients;
     private GUI gui;
-    protected ServerSocket s;
-    private MutexMonitor mtx = new MutexMonitor();
+    private ServerSocket s;
+    private ShareMutexMonitor mtx;
 
-    public Server(String IP_ADDRESS, int PORT, GUI gui) {
+    public Server(String IP_ADDRESS, int PORT, GUI gui, ShareMutexMonitor m) {
         this.PORT = PORT;
         this.IP_ADDRESS = IP_ADDRESS;
         this.gui = gui;
-        pool = Executors.newFixedThreadPool(NTHREADS);
+        this.mtx = m;
+        this.pool = Executors.newFixedThreadPool(NTHREADS);
+        
     }
     
     @Override
@@ -58,7 +59,9 @@ public class Server extends SwingWorker{
                 pool.submit(t);
                 // create a thread for each connection
             }
-        } catch (IOException e1) {
+        } 
+        catch (IOException e) {}
+        catch (Exception e1){ 
             log(getCurrentServerTime()+": Server launch failed.");
         }
     }
@@ -69,9 +72,9 @@ public class Server extends SwingWorker{
             pool.shutdown();
             s.close();
             log(getCurrentServerTime()+": Server stoped.");
-        } catch (IOException e) {
-            log("Server stop failed.");
-        }
+        } 
+        catch (IOException e) {}
+        catch(Exception e1){log("Server stop failed.");}
         
     }
     

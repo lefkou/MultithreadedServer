@@ -22,17 +22,22 @@ public class GUI extends javax.swing.JFrame {
     public boolean isServerRunning = false;
     Timer currentTimeTimer;
     Timer updateInfoPanelTimer;
+    ShareMutexMonitor mtx = new ShareMutexMonitor();
     public GUI(){
-        server = new Server("localhost", 8189, this);
+        this.server = new Server("localhost", 8189, this, this.mtx);
         this.currentTimeTimer = new Timer(500,(e) -> {
+            mtx.enterCrit();
             serverTime_textField.setText(server.getCurrentServerTime());
+            mtx.exitCrit();
         });
         this.updateInfoPanelTimer = new Timer(100,(e) -> {
+            mtx.enterCrit();
             shareInfo_textArea.setText(StockMarket.status());
+            mtx.exitCrit();
         });
         initComponents();
-        currentTimeTimer.start();
-        updateInfoPanelTimer.start();
+        this.currentTimeTimer.start();
+        this.updateInfoPanelTimer.start();
     }
 
     /**
@@ -132,9 +137,9 @@ public class GUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(serverLog_label)
-                    .addComponent(shareInfo_label))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(shareInfo_label, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(serverLog_label))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
@@ -163,9 +168,14 @@ public class GUI extends javax.swing.JFrame {
     private void startServer_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startServer_buttonActionPerformed
         // start server and assign gui to server to use
         if(!isServerRunning){
-            server = new Server("localhost", 8189, this);
-            server.execute();
-            isServerRunning = true; 
+            try {
+                server = new Server("localhost", 8189, this, this.mtx);
+                server.execute();
+                isServerRunning = true; 
+            } catch (Exception e) {
+                isServerRunning = false;
+            }
+            
         }
         
         
@@ -174,9 +184,13 @@ public class GUI extends javax.swing.JFrame {
     private void stopServer_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopServer_buttonActionPerformed
         // stop server and print
         if(isServerRunning){
-            server.stop();
-            server.cancel(true);
-            this.isServerRunning = false;
+            try {
+                server.stop();
+                server.cancel(true);
+                this.isServerRunning = false;
+            } catch (Exception e) {
+                this.isServerRunning = true;
+            }
         }
 
     }//GEN-LAST:event_stopServer_buttonActionPerformed

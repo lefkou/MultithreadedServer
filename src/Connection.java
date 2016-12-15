@@ -11,10 +11,12 @@ import javax.swing.SwingUtilities;
 public class Connection implements Runnable{
     private Socket incoming;
     private GUI gui;
+    private Server server;
 
-    public Connection(Socket incoming, GUI gui) {
+    public Connection(Socket incoming, Server server, GUI gui) {
         this.incoming = incoming;
         this.gui = gui; 
+        this.server = server;
     }
 
     public Socket getIncoming(){
@@ -36,9 +38,13 @@ public class Connection implements Runnable{
                     (incoming.getOutputStream(), true /* auto flush */);
             out.println("\nYou are connected to the share price "
                     + "quotation server: ");
-            out.println(incoming.getInetAddress()
+            out.println(incoming.getLocalAddress()
                     + " on port " + incoming.getLocalPort()
                     + "\n"
+            );
+            log("\n" + this.server.getCurrentServerTime() +
+                    ": Client with IP "+ incoming.getInetAddress() +
+                    " at port " + incoming.getPort() + "\n\t  connected."
             );
             // INSERT CODE FOR LOG 
             StockMarket.getPrices().values().forEach(v -> {
@@ -69,6 +75,11 @@ public class Connection implements Runnable{
                             cs.setNumberOfShares(difference);
                             out.println("Order Confirmed");
                             // INSERT CODE FOR LOG 
+                            log("\n"+ this.server.getCurrentServerTime() + 
+                                ": Client with IP "+ incoming.getInetAddress() +
+                                " at port " + incoming.getPort() + "\n\t  bought "+
+                                numberOfSharesReq + " shares of "+ cs.getCode()
+                        );
                         }else{
                             out.println("Order failed. Not enough shares.");
                         }
@@ -78,13 +89,20 @@ public class Connection implements Runnable{
                         cs.setNumberOfShares(cs.getNumberOfShares()+ numberOfSharesReq);
                         out.println("Order Confirmed");
                         // INSERT CODE FOR LOG 
+                        log("\n"+ this.server.getCurrentServerTime() + 
+                            ": Client with IP "+ incoming.getInetAddress() +
+                            " at port " + incoming.getPort() + "\n\t  sold "+
+                            numberOfSharesReq + " shares of "+ cs.getCode()
+                        );
                     }
                 } 
             }
             out.println("\nGoodbye.\n");
             incoming.close();
-            // INSERT CODE FOR LOG 
-            log("Connection killed.");
+            log("\n"+ this.server.getCurrentServerTime() + 
+                    ": Client with IP "+ incoming.getInetAddress() +
+                    " at port " + incoming.getPort() + "\n\t  disconnected."
+            );
         }catch (IOException e){}
     }
 }

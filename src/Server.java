@@ -38,7 +38,7 @@ public class Server extends SwingWorker{
     
     // get server's time
     public String getCurrentServerTime(){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
         return dateFormat.format(date); //yyyy/MM/dd HH:mm:ss
     }
@@ -47,18 +47,18 @@ public class Server extends SwingWorker{
     public void start(){
         try {
             s = new ServerSocket(PORT);
-            log("Server started at : " + getCurrentServerTime());
+            log(getCurrentServerTime()+": Server started.");
             while (true) {
                 // accept connection
                 Socket incoming = s.accept();
                 // create connection
-                Connection t = new Connection(incoming, this.gui);
+                Connection t = new Connection(incoming, this, this.gui);
                 // add IP to connected IP list
                 pool.submit(t);
                 // create a thread for each connection
             }
         } catch (IOException e1) {
-            log("Server launch failed.");
+            log(getCurrentServerTime()+": Server launch failed.");
         }
     }
     
@@ -67,7 +67,7 @@ public class Server extends SwingWorker{
         try{
             pool.shutdown();
             s.close();
-            log("Server stoped at : " + getCurrentServerTime()+ ".");
+            log(getCurrentServerTime()+": Server stoped.");
         } catch (IOException e) {
             log("Server stop failed.");
         }

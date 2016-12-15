@@ -1,44 +1,88 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import javax.swing.SwingWorker;
 
 /**
  * Created by lef on 06/12/2016.
  */
-public class Server{
+public class Server extends SwingWorker{
 
-    private final int NTHREADS = 10;
+    private final int NTHREADS = 1;
     private int PORT ;
     private String IP_ADDRESS;
     private ExecutorService pool;
-    private List<String> connectedClients;
+    private List<Future> connectedClients;
+    private GUI gui;
+    protected ServerSocket s;
 
-    public Server(String IP_ADDRESS, int PORT) {
+    public Server(String IP_ADDRESS, int PORT, GUI gui) {
         this.PORT = PORT;
         this.IP_ADDRESS = IP_ADDRESS;
+        this.gui = gui;
         pool = Executors.newFixedThreadPool(NTHREADS);
     }
-
-    public void launch(){
+    
+    @Override
+    public Object doInBackground(){
+        this.start();
+        return null;
+    }
+    
+    // get server's time
+    public String getCurrentServerTime(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        return dateFormat.format(date); //yyyy/MM/dd HH:mm:ss
+    }
+    
+    // method starts accepting connections 
+    public void start(){
         try {
-            ServerSocket s = new ServerSocket(PORT);
+            s = new ServerSocket(PORT);
+            log("Server started at : " + getCurrentServerTime());
             while (true) {
                 // accept connection
                 Socket incoming = s.accept();
                 // create connection
-                ConnectionThread t = new ConnectionThread(incoming);
+                Connection t = new Connection(incoming, this.gui);
                 // add IP to connected IP list
-//                this.connectedClients.add(String.valueOf(t.getIncoming().getInetAddress()));
-                // create a thread for each connection
                 pool.submit(t);
+                // create a thread for each connection
             }
-        } catch (IOException e1) {}
+        } catch (IOException e1) {
+            log("Server launch failed.");
+        }
     }
+    
+    // stops the server and prints info in server log
+    public void stop() {
+        try{
+            pool.shutdown();
+            s.close();
+            log("Server stoped at : " + getCurrentServerTime()+ ".");
+        } catch (IOException e) {
+            log("Server stop failed.");
+        }
+        
+    }
+    
+    // logs information to server log
+    public void log(String text){
+         this.gui.getServerLog_textArea().append(text + "\n");
+    }
+    
+ 
 
-    public List<String> getConnectedIPs(){
-        return this.connectedClients;
-    }
+
+    
+
+    
 }

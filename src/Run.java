@@ -1,3 +1,10 @@
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,13 +16,15 @@
  * @author lef
  */
 public class Run {
-    public static void main(String[] args) {
-        Server s = new Server("localhost", 8189);
-        s.launch();
-//        String a = "BUY BP 1000";
-//        String[] ar = a.split(" ");
-//        for (String string : ar) {
-//            System.out.println(string);
-//        }   
-    }
+    public static void main(String args[]){
+            /* Create and display the form */
+            SwingUtilities.invokeLater(()-> {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+                    Logger.getLogger(Run.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                new GUI().setVisible(true);
+            });
+        }
 }

@@ -3,14 +3,8 @@ import javax.swing.JTextArea;
 import javax.swing.Timer;
 
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author lef
+ * This is the interface of the server and calls the rest of the classes. It is
+ * created in the run class.
  */
 public class GUI extends javax.swing.JFrame {
     
@@ -176,6 +170,8 @@ public class GUI extends javax.swing.JFrame {
                 isServerRunning = false;
             }
             
+        }else{
+            this.getServerLog_textArea().append("Server start failed." + "\n");
         }
         
         

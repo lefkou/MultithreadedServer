@@ -9,12 +9,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.SwingWorker;
 
-/**
- * Created by lef on 06/12/2016.
+/*
+ * This server creates many connections using the connection class and allows 
+ * more than one user to connect
  */
 public class Server extends SwingWorker{
 
-    private final int NTHREADS = 10;
+    private final int NTHREADS = 3;
     private int PORT ;
     private String IP_ADDRESS;
     private ExecutorService pool;
@@ -71,7 +72,7 @@ public class Server extends SwingWorker{
         try{
             pool.shutdown();
             s.close();
-            log(getCurrentServerTime()+": Server stoped.");
+            log(getCurrentServerTime()+": Server stopped.");
         } 
         catch (IOException e) {}
         catch(Exception e1){log("Server stop failed.");}

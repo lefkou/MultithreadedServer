@@ -1,12 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author lef
+ * This class represent the object of Companyshare and is accessed and written
+ * very often.
  */
 public class CompanyShare {
     private String code;
@@ -40,7 +34,7 @@ public class CompanyShare {
     @Override
     public String toString() {
         return "Code: " + this.code + "\n" +"Price: " + this.price + "\n" +
-                "Available Shares: " + this.numberOfShares;
+                "Available Shares: " + this.numberOfShares + "\n";
     }
 
     

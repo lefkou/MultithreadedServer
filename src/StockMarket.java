@@ -2,15 +2,10 @@
 import java.util.HashMap;
 
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This represents a stock market and is used to create specific shares and is
+ * accessed at least once every 100ms
  */
 
-/**
- *
- * @author lef
- */
 public class StockMarket {
     private static HashMap<String, CompanyShare> prices = new HashMap<String, CompanyShare>(){{
             put("SKY",  new CompanyShare("SKY" , 777.2, 1000));

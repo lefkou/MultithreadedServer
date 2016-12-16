@@ -6,8 +6,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import javax.swing.SwingUtilities;
 
-/**
- * Created by lef on 06/12/2016.
+/*
+ * Connection class which is assigned dynamically to a thread pool and allows 
+ * a user to connect.
  */
 public class Connection implements Runnable {
 
